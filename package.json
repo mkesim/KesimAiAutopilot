@@ -1,10 +1,10 @@
 {
-  "name": "KesimAiAutopilot",
+  "name": "kesim-ai-autopilot",
   "displayName": "Kesim Ai Autopilot",
   "description": "Kesim Ai Autopilot is an AI-powered extension that provides autopilot features for your application",
   "version": "0.0.1",
   "engines": {
-    "vscode": "^1.86.0"
+    "vscode": "^1.86.0" 
   },
   "categories": [
     "Other"

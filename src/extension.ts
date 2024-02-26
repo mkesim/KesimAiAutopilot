@@ -1,9 +1,11 @@
-import * as vscode from 'vscode';
+import { commands, window, TextEditorEdit, ExtensionContext, languages, CompletionItem, StatusBarAlignment, StatusBarItem } from 'vscode';
 import axios from 'axios';
 
-export function activate(context: vscode.ExtensionContext) {
-    let disposable = vscode.commands.registerCommand('extension.helloWorld', async () => {
-        const editor = vscode.window.activeTextEditor;
+let myStatusBarItem: StatusBarItem;
+
+export function activate(context: ExtensionContext) {
+    let disposable = commands.registerCommand('KesimAiAutopilot.helloWorld', async () => {
+        const editor = window.activeTextEditor;
         if (editor) {
             const document = editor.document;
             const selection = editor.selection;
@@ -49,9 +51,10 @@ export function activate(context: vscode.ExtensionContext) {
                 const completion = response.data;
 
                 // Insert the completion at the current cursor position
-                editor.edit(editBuilder => {
+                editor.edit((editBuilder: TextEditorEdit) => {
                     editBuilder.insert(selection.start, completion);
                 });
+                
             } catch (error) {
                 console.error(error);
             }
@@ -59,6 +62,25 @@ export function activate(context: vscode.ExtensionContext) {
     });
 
     context.subscriptions.push(disposable);
+
+    // Register a completion item provider for JavaScript
+    languages.registerCompletionItemProvider('javascript', {
+        provideCompletionItems() {
+            // TODO: Implement your autocomplete logic here
+            return [new CompletionItem('YourCompletionItem')];
+        }
+    });
+
+    // Create a status bar item
+    myStatusBarItem = window.createStatusBarItem(StatusBarAlignment.Right, 100);
+    myStatusBarItem.command = 'KesimAiAutopilot.helloWorld';
+    context.subscriptions.push(myStatusBarItem);
+
+    // Show the status bar item
+    myStatusBarItem.show();
 }
 
-export function deactivate() {}
+export function deactivate() {
+    // Hide the status bar item
+    myStatusBarItem.hide();
+}
