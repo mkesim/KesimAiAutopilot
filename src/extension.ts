@@ -1,26 +1,64 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
+import axios from 'axios';
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
+    let disposable = vscode.commands.registerCommand('extension.helloWorld', async () => {
+        const editor = vscode.window.activeTextEditor;
+        if (editor) {
+            const document = editor.document;
+            const selection = editor.selection;
+            const text = document.getText(selection);
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "KesimAiAutopilot" is now active!');
+            // Prepare the data for the DeepSeek API
+            let data = JSON.stringify({
+                "messages": [
+                    {
+                        "content": "You are a helpful assistant",
+                        "role": "system"
+                    },
+                    {
+                        "content": text,
+                        "role": "user"
+                    }
+                ],
+                "model": "deepseek-coder",
+                "frequency_penalty": 0,
+                "max_tokens": 2048,
+                "presence_penalty": 0,
+                "stop": null,
+                "stream": false,
+                "temperature": 1,
+                "top_p": 1
+            });
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	let disposable = vscode.commands.registerCommand('KesimAiAutopilot.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from Kesim Ai Autopilot!');
-	});
+            // Prepare the config for the axios request
+            let config = {
+                method: 'post',
+                url: 'https://api.deepseek.com/v1/chat/completions',
+                headers: { 
+                    'Content-Type': 'application/json', 
+                    'Accept': 'application/json', 
+                    'Authorization': 'Bearer sk-5e9cd267d35644568ab55ba6f766f5a1'
+                },
+                data : data
+            };
 
-	context.subscriptions.push(disposable);
+            // Make the request to the DeepSeek API
+            try {
+                const response = await axios(config);
+                const completion = response.data;
+
+                // Insert the completion at the current cursor position
+                editor.edit(editBuilder => {
+                    editBuilder.insert(selection.start, completion);
+                });
+            } catch (error) {
+                console.error(error);
+            }
+        }
+    });
+
+    context.subscriptions.push(disposable);
 }
 
-// This method is called when your extension is deactivated
 export function deactivate() {}
