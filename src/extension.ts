@@ -36,11 +36,11 @@ export function activate(context: ExtensionContext) {
             // Prepare the config for the axios request
             let config = {
                 method: 'post',
-                url: 'https://api.deepseek.com/v1/chat/completions',
+                url: 'https://KESİM-TECH/v1/chat/completions',
                 headers: { 
                     'Content-Type': 'application/json', 
                     'Accept': 'application/json', 
-                    'Authorization': 'Bearer sk-5e9cd267d35644568ab55ba6f766f5a1'
+                    'Authorization': 'USER API TOKEN'
                 },
                 data : data
             };
